@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
-using ServiceStack.CacheAccess;
-using ServiceStack.CacheAccess.Providers;
+using ServiceStack.OrmLite;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
+using ServiceStack.ServiceInterface.Validation;
 using ServiceStack.WebHost.Endpoints;
 
 namespace WebApplicationServiceStackTest
 {
 
-    public class Global : System.Web.HttpApplication
+    public class Global : HttpApplication
     {
 
-        public class HelloWorldAppHost: AppHostBase
+        public class UnitAppHost : AppHostBase
         {
-            public HelloWorldAppHost() : base("Hello World test", typeof (HelloWorldService).Assembly)
+            public UnitAppHost()
+                : base("Unit test", typeof(UnitSoldService).Assembly)
             {
                 
             }
@@ -35,13 +33,22 @@ namespace WebApplicationServiceStackTest
                 Plugins.Add(new AuthFeature(
                     () => new AuthUserSession(),
                     new IAuthProvider[] {new BasicAuthProvider(), }));
+
+                //Register the Validation Plugin
+                Plugins.Add(new ValidationFeature());
+                container.RegisterValidators(typeof(UnitSoldService).Assembly);
                 
 
                 //Register users
                 Plugins.Add(new RegistrationFeature());
 
                 //Add the cache container for the auth
-                container.Register<ICacheClient>(new MemoryCacheClient());
+                //container.Register<ICacheClient>(new MemoryCacheClient());
+
+                
+                //Caching with Redis
+                //container.Register<IRedisClientsManager>(c => new PooledRedisClientManager());
+                //container.Register<ICacheClient>(c => (ICacheClient) c.Resolve<IRedisClientsManager>().GetCacheClient());
 
                 //Defines the user repository
                 var userRepository =  new InMemoryAuthRepository();
@@ -69,12 +76,20 @@ namespace WebApplicationServiceStackTest
                         PasswordHash = hash,
                         Salt = salt
                     }, password);
+
+
+                //var dbConnectionFactory =
+                //    new OrmLiteConnectionFactory(HttpContext.Current.Server.MapPath("~/App_Data/data.txt"), true, SqliteDialect.Provider);
+
+                //container.Register<IDbConnectionFactory>(dbConnectionFactory);
+
+                //container.RegisterAutoWired<UnitsRepository>();
             }
         }
 
         protected void Application_Start(object sender, EventArgs e)
         {
-            new HelloWorldAppHost().Init();
+            new UnitAppHost().Init();
         }
 
         protected void Session_Start(object sender, EventArgs e)

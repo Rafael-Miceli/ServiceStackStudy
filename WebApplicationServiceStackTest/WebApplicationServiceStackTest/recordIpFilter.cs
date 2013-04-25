@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Caching;
-using ServiceStack.CacheAccess;
+﻿using ServiceStack.CacheAccess;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 
@@ -15,7 +10,7 @@ namespace WebApplicationServiceStackTest
 
         public override void Execute(IHttpRequest req, IHttpResponse res, object requestDto)
         {
-            Cach.Add("last ip", req.UserHostAddress);
+            Cach.Add("ip", req.UserHostAddress);
         }
     }
 
@@ -25,11 +20,11 @@ namespace WebApplicationServiceStackTest
 
         public override void Execute(IHttpRequest req, IHttpResponse res, object responseDto)
         {
-            var status = responseDto as HelloWorldReponse;
+            var status = responseDto as UnitSoldReponse;
 
             if (status != null)
             {
-                status.Result += " Last Ip: " + Cach.Get<string>("last ip");
+                status.Result += " Seu IP é: " + Cach.Get<string>("ip");
             }
         }
     }
