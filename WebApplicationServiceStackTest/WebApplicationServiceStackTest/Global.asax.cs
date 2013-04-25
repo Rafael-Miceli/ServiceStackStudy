@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
-using ServiceStack.OrmLite;
 using ServiceStack.ServiceInterface;
 using ServiceStack.ServiceInterface.Auth;
 using ServiceStack.ServiceInterface.Validation;
@@ -32,7 +31,7 @@ namespace WebApplicationServiceStackTest
                 //Add the auth feature
                 Plugins.Add(new AuthFeature(
                     () => new AuthUserSession(),
-                    new IAuthProvider[] {new BasicAuthProvider(), }));
+                    new IAuthProvider[] {new BasicAuthProvider()}));
 
                 //Register the Validation Plugin
                 Plugins.Add(new ValidationFeature());
@@ -63,7 +62,7 @@ namespace WebApplicationServiceStackTest
                 const string password = "password";
                 new SaltedHash().GetHashAndSaltString(password, out hash, out salt);
 
-                userRepository.CreateUserAuth(new UserAuth()
+                userRepository.CreateUserAuth(new UserAuth
                     {
                         Id = 1,
                         DisplayName = "Rafael",
